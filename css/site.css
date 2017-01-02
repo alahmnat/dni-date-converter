@@ -1,0 +1,21 @@
+#main {
+	padding: 40px 15px;
+}
+
+input[id$="DateDay"], input[id$="DateHour"], input[id$="DateMinute"], input[id$="DateYahr"], input[id$="DateGartahvo"], input[id$="DateTahvo"], input[id$="DateGorahn"], input[id$="DateProrahn"] {
+	width: 60px !important;
+}
+
+input[id$="DateYear"], input[id$="DateHahr"] {
+	width: 90px !important;
+}
+
+#EraSelector button span:first-child {
+	display: inline-block;
+	width: 29px;
+	text-align: left;
+}
+
+.form-inline .form-group {
+	margin-bottom: 10px;
+}

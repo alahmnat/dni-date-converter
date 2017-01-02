@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>D'ni date converter</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/site.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div id="main">
+				<div class="row">
+					<h2>Convert Gregorian Date to D'ni</h2>
+					<div class="col-md-6">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">Gregorian Date</h3>
+							</div>
+							<div class="panel-body">
+								<div class="form-inline">
+									<div class="form-group">
+										<select id="GregorianDateMonth" class="form-control">
+											<option value="1">January</option>
+											<option value="2">February</option>
+											<option value="3">March</option>
+											<option value="4">April</option>
+											<option value="5">May</option>
+											<option value="6">June</option>
+											<option value="7">July</option>
+											<option value="8">August</option>
+											<option value="9">September</option>
+											<option value="10">October</option>
+											<option value="11">November</option>
+											<option value="12">December</option>
+										</select>
+										<input type="number" id="GregorianDateDay" maxlength="2" step="1" class="form-control" min="1" max="31" />
+										<div class="input-group">
+											<input type="number" id="GregorianDateYear" maxlength="4" step="1" min="1" class="form-control" />
+											<div class="input-group-btn" id="SurfaceEraSelector">
+												<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>CE</span> <span class="caret"></span></button>
+												<ul class="dropdown-menu dropdown-menu-right">
+													<li><a href="#">BCE</a></li>
+													<li><a href="#">CE</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+										<br />
+									<div class="form-group">
+										<input type="number" id="GregorianDateHour" class="form-control" maxlength="2" value="12" min="1" max="12" /> :
+										<div class="input-group">
+											<input type="number" id="GregorianDateMinute" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="59" />
+											<div class="input-group-btn" id="MeridianSelector">
+												<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>AM</span> <span class="caret"></span></button>
+												<ul class="dropdown-menu dropdown-menu-right">
+													<li><a href="#">AM</a></li>
+													<li><a href="#">PM</a></li>
+												</ul>
+											</div>
+										</div>
+										<button id="ConvertSurfaceToCavernDate" class="btn btn-primary">Convert to D'ni Date</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">D'ni Date</h3>
+							</div>
+							<div class="panel-body">
+								<div class="form-group">
+									<input type="text" class="form-control" id="DniDate" value="" placeholder="Enter a date on the left." />
+								</div>
+								<p>
+									Time is listed in gartahvotee:tahvotee:gorahntee:prorahntee. For more information about D'ni time, see <a href="https://archive.guildofarchivists.org/wiki/D%27ni_time" target="_blank">this Guild of Archivists article</a>.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<h2>Convert D'ni Date to Gregorian</h2>
+					<div class="col-md-6">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">D'ni Date</h3>
+							</div>
+							<div class="panel-body">
+								<div class="form-inline">
+									<div class="form-group">
+										<select id="DniDateVailee" class="form-control">
+											<option value="1">Leefo</option>
+											<option value="2">Leebro</option>
+											<option value="3">Leesahn</option>
+											<option value="4">Leetar</option>
+											<option value="5">Leevot</option>
+											<option value="6">Leevofo</option>
+											<option value="7">Leevobro</option>
+											<option value="8">Leevosahn</option>
+											<option value="9">Leevotar</option>
+											<option value="10">Leenovoo</option>
+										</select>
+										<input type="number" id="DniDateYahr" maxlength="2" step="1" class="form-control" min="1" max="29" />
+										<div class="input-group">
+											<input type="number" id="DniDateHahr" maxlength="4" step="1" min="0" class="form-control" />
+											<div class="input-group-btn" id="DniEraSelector">
+												<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>DE</span> <span class="caret"></span></button>
+												<ul class="dropdown-menu dropdown-menu-right">
+													<li><a href="#">BE</a></li>
+													<li><a href="#">DE</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+										<br />
+									<div class="form-group">
+										<input type="number" id="DniDateGartahvo" class="form-control pad-numbers" maxlength="1" value="0" min="0" max="4" /> :
+										<input type="number" id="DniDateTahvo" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="24" /> :
+										<input type="number" id="DniDateGorahn" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="24" /> :
+										<input type="number" id="DniDateProrahn" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="24" />
+										<button id="ConvertCavernToSurfaceDate" class="btn btn-primary">Convert to Gregorian Date</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Gregorian Date</h3>
+							</div>
+							<div class="panel-body">
+								<div class="form-group">
+									<input type="text" class="form-control" id="SurfaceDate" value="" placeholder="Enter a date on the left." />
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<p class="text-center">
+						Implementation by <a href="http://www.twitter.com/alahmnat">@alahmnat</a>. Original formulas by Brett Middleton.<br /> 
+						More information is available <a href="https://archive.guildofarchivists.org/wiki/D%27ni_time_conversion">here</a>.
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/DniDate.js"></script>
+		<script type="text/javascript">
+			var surfaceEra = "CE";
+			var dniEra = "DE";
+			var meridian = "AM";
+			
+			$("#SurfaceEraSelector li").on("click", function() {
+				$("#SurfaceEraSelector button span:first-child").text($(this).text());
+				surfaceEra = $(this).text();
+			});
+			
+			$("#DniEraSelector li").on("click", function() {
+				$("#DniEraSelector button span:first-child").text($(this).text());
+				dniEra = $(this).text();
+			});
+			
+			$("#MeridianSelector li").on("click", function() {
+				$("#MeridianSelector button span:first-child").text($(this).text());
+				meridian = $(this).text();
+			});
+			
+			$(".pad-numbers").on("change", function() {
+				if($(this).val() < 10) {
+					$(this).val("0" + $(this).val());
+				}
+			})
+			
+			$("#ConvertSurfaceToCavernDate").on("click", function() {
+				if($("#GregorianDateYear").val() === "" || $("#GregorianDateMonth").val() === "" || $("#GregorianDateDay").val() === "") {
+					alert("You must enter a complete date first!")
+					return;
+				}
+				
+				var year = parseFloat($("#GregorianDateYear").val());
+				var month = parseFloat($("#GregorianDateMonth").val());
+				var day = parseFloat($("#GregorianDateDay").val());
+				var hour = parseFloat($("#GregorianDateHour").val());
+				var minute = parseFloat($("#GregorianDateMinute").val());
+				var second = 0;
+				
+				if(surfaceEra == "BCE") {
+					year = -1 * year + 1;
+				}
+				
+				if(meridian === "PM") {
+					hour = hour + 12;
+				}
+				
+				var surfaceDate = new Date(year, month - 1, day, hour, minute, second);
+				surfaceDate.setFullYear(year);
+				
+				var cavernDate = new DniDate();
+				cavernDate.setFromSurfaceDate(surfaceDate);
+				
+				$("#DniDate").val(cavernDate.toString());
+			});
+			
+			$("#ConvertCavernToSurfaceDate").on("click", function() {
+				if($("#DniDateHahr").val() === "" || $("#DniDateVailee").val() === "" || $("#DniDateYahr").val() === "") {
+					alert("You must enter a complete date first!");
+					return;
+				}
+				
+				var hahr = parseFloat($("#DniDateHahr").val());
+				var vailee = parseFloat($("#DniDateVailee").val());
+				var yahr = parseFloat($("#DniDateYahr").val());
+				var gartahvo = parseFloat($("#DniDateGartahvo").val());
+				var tahvo = parseFloat($("#DniDateTahvo").val());
+				var gorahn = parseFloat($("#DniDateGorahn").val());
+				var prorahn = parseFloat($("#DniDateProrahn").val());
+				
+				if(dniEra == "BE") {
+					hahr = hahr * -1;
+				}
+				
+				var cavernDate = new DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn);
+				var surfaceDate = cavernDate.toSurfaceDate();
+				
+				$("#SurfaceDate").val(surfaceDate.toUTCString());
+			});
+		</script>
+	</body>
+</html>
