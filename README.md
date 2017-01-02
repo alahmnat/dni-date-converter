@@ -14,18 +14,24 @@ You can create a new `DniDate()` in one of three ways.
 
 #### Supply a D'ni date
 
- `var dd = new DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn);`
+```javascript
+var dd = new DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn);
+```
 
 #### Call `DniDate.now()`
 
-`var dd = DniDate.now();`
+```javascript
+var dd = DniDate.now();
+```
 
 #### Create from Gregorian date
 
 Generate a new `DniDate()`, then pass a `Date()` object into the `setFromSurfaceDate()` method: 
 
-`var dd = new DniDate(); `
-`dd.setFromSurfaceDate(surfaceDate);`
+```javascript
+var dd = new DniDate();
+dd.setFromSurfaceDate(surfaceDate);
+```
 
 **NOTE:** If you create a Gregorian date between 1 CE and 99 CE (1 - 99) by calling `new Date(year, month, day)`, the `Date()` object will "helpfully" set your date in the 20th century (1901 - 1999). To avoid this, create the `Date()` object, then call `setFullYear()` with your desired year before passing it into `DniDate()`.
 
