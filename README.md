@@ -2,81 +2,105 @@
 
 The D'ni Date Converter is a JavaScript implementation of the D'ni↔Gregorian calendar conversion algorithms originally developed by Brett Middleton. Details about the algorithms themselves can be found [here](https://archive.guildofarchivists.org/wiki/D%27ni_time_conversion).
 
-This project contains both the converter and a website which can be used to convert arbitrary dates between the two calendar systems. To use the date converter in your own project, you should only need the DniDate object's declaration, which is in `js/DniDate.js`. 
+This project contains both the converter and a website which can be used to convert arbitrary dates between the two calendar systems. To use the date converter in your own project, you will only need `js/DniDate.js`. 
 
-## DniDate() Object
+## `DniDate` Object
 
-This object is modeled on the native JavaScript `Date()` object, and supports manipulation of dates in the D'ni calendar, just as the `Date()` object supports manipulating dates in the Gregorian calendar.
+`DniDate` is modeled stylistically on the native JavaScript `Date` object, with similar getters and setters for the various components of a D'ni date. It also supports manipulation of D'ni dates, just as the `Date` object supports manipulating dates in the Gregorian calendar.
 
-### Creating a new date
-
-You can create a new `DniDate()` in one of three ways.
-
-#### Supply a D'ni date
+### Initialization
 
 ```javascript
-var dd = new DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn);
+new DniDate();
+new DniDate(hahr[, vailee[, yahr[, gartahvo[, tahvo[, gorahn[, prorahn]]]]]]);
+```
+If no arguments are provided, the constructor creates a `DniDate` object for the current D'ni date and time.
+
+If at least one argument is provided, missing arguments are either set to 1 (for the yahr, if missing), or 0 for all others.
+
+If a value falls outside of the valid range for that argument, the adjacent value will be adjusted. For instance, `new DniDate(2500, 10, 1)` is equivalent to `new DniDate(2501, 0, 1)` – both create a date for Leefo 1, 2501. This auto-adjustment applies to all arguments besides `hahr`.
+
+#### Examples
+```javascript
+var dd = new DniDate(9672, 8, 3, 2, 5, 20, 12); // Leevosahn 3 9672 DE 2:05:20:12
+var dd = new DniDate(9672, 8, 3); // Leevosahn 3 9672 DE 0:00:00:00
+var dd = new DniDate(9672); // Leefo 1 9672 DE 0:00:00:00
+var dd = new DniDate(); // Date will be set to the current D'ni date and time
 ```
 
-#### Call `DniDate.now()`
+### Instance methods
+#### Converters
+##### `setFromSurfaceDate(dateObject)`
+Sets the `DniDate` object to the D'ni date and time that matches the supplied JavaScript `Date` object.
+
+**NOTE**: If you try to create a Gregorian date between 1 CE and 99 CE (1 - 99) by calling `new Date(year, month, day)`, the `Date` object will "helpfully" set your date in the 20th century (1901 - 1999). To avoid this, create the `Date` object, then call `setFullYear()` with your desired year before passing it into `DniDate`:
 
 ```javascript
-var dd = DniDate.now();
-```
+var surfaceDate = new Date(47, 0, 1); // January 1, 1947
+surfaceDate.setFullYear(47); // January 1, 0047
 
-#### Create from Gregorian date
-
-Generate a new `DniDate()`, then pass a `Date()` object into the `setFromSurfaceDate()` method: 
-
-```javascript
 var dd = new DniDate();
 dd.setFromSurfaceDate(surfaceDate);
 ```
 
-**NOTE:** If you create a Gregorian date between 1 CE and 99 CE (1 - 99) by calling `new Date(year, month, day)`, the `Date()` object will "helpfully" set your date in the 20th century (1901 - 1999). To avoid this, create the `Date()` object, then call `setFullYear()` with your desired year before passing it into `DniDate()`.
+##### `toSurfaceDate()`
+Returns a new `Date` object set to the Gregorian calendar equivalent of the `DniDate`'s date and time.
 
-### Converting dates
-
-#### "Surface" (Gregorian) date to D'ni
-
-Follow the instructions above, under "Create from Gregorian date".
-
-#### D'ni date to Gregorian date
-
-Create a `DniDate()` object with the desired D'ni date, then call `toSurfaceDate()`. This will return a new `Date()` object set to the equivalent date in the Gregorian calendar.
-
-### Modifying the date
-
-You can use one of the `setX` methods to alter a particular component of the D'ni date once it has been created. There are set methods for the following date components:
-
-* Hahr
-* Vailee (0-indexed)
-* Yahr
-* Gartahvo
-* Tahvo
-* Gorahn
-* Prorahn
-
-If you supply a value for a date component that is out of range (such as calling `setVailee(10)` when the valid range is 0 through 9), a valid date will automatically be calculated. In this case, `hahr` will be incremented by 1, and `vailee` will be set to 0.
-
-You many notice that there is a `getPartahvo()`, method, but no `setPartahvo()` method. This is because `DniDate()` treats the partahvo as a calculated unit, rather than a specified one. The value of the partahvo in a given date is determined by dividing the number of tahvotee by 5, then rounding down.
-
-### Retrieving / formatting D'ni dates
-
-There are three built-in methods for displaying a D'ni date:
-
-1. `toDateString()`: Returns the vailee, yahr, and hahr (month, day, year), as well as the era (BE or DE).
-2. `toTimeString()`: Returns the gartahvo, tahvo, gorahn, and prorahn, separated by colons. The tahvo, gorahn, and prorahn values are zero-padded to two digits in this output for better legibility.
-3. `toString()`: Returns both of the above values, concatenated together by a space.
-
-Alternatively, you can build your own date format using the following getters:
+#### Getters
 
 * `getHahr()`
 * `getVailee()` (returns a value between 0 and 9 representing the numerical vailee value)
-* `getVaileeName()` (returns the actual vailee name, written in [OTS](https://archive.guildofarchivists.org/wiki/D%27ni_(language)#Old_Transliteration_Standard)).
+* `getVaileeName()` (returns the actual vailee name as a string value, written in [OTS](https://archive.guildofarchivists.org/wiki/D%27ni_(language)#Old_Transliteration_Standard)).
 * `getYahr()`
 * `getGartahvo()`
 * `getPartahvo()` (not commonly used; this value divides the D'ni yahr into 5 segments, rather than the tahvo's 25)
 * `getTahvo()`
 * `getGorahn()`
 * `getProrahn()`
+
+#### Setters
+
+* `setHahr()`
+* `setVailee()` (uses 0-indexed values)
+* `setGartahvo()`
+* `setTahvo()`
+* `setGorahn()`
+* `setProrahn()`
+
+As with the constructor, if you supply a value that falls outside of the valid range for that date component via one of these setters, a valid date will automatically be calculated by adjusting adjacent values.
+
+You may notice that there is a `getPartahvo()`, method, but no `setPartahvo()` method. This is because `DniDate` treats the partahvo as a calculated unit, rather than a specified one. The value of the partahvo in a given date is determined by dividing the number of tahvotee by 5, then rounding down, resulting in an integer value between 0 and 4.
+
+#### Formatters
+
+##### `toDateString()`
+
+Returns a string with the vailee name, yahr, and hahr (month, day, year), as well as the era (BE or DE).
+
+##### `toTimeString()`
+
+Returns the gartahvo, tahvo, gorahn, and prorahn, separated by colons. The tahvo, gorahn, and prorahn values are zero-padded to two digits in this output for better legibility.
+
+##### `toString()`
+
+Overrides the default `Object` behavior and returns a single string with both date and time values, concatenated together by a space.
+
+### Dealing with timezones
+
+#### Converting to D'ni Time
+
+D'ni has only one timezone, which is aligned to UTC-0700 (Mountain Standard Time). Daylight Saving Time does not apply in D'ni, so during the summer, the offset remains UTC-0700. When converting a surface date to D'ni time using ``setFromSurfaceDate()``, the ``Date`` object will be converted to UTC-0700. This means that 1/1/1900 12:00:00 UTC-0800 and 1/1/1900 12:00:00 UTC-0700 will return different D'ni dates, while 1/1/1900 12:00:00 UTC-0700 and 1/1/1900 13:00:00 UTC-0800 will return the same D'ni date.
+
+#### Converting to Surface Time
+
+The surface dates returned by `toSurfaceDate()` are aligned to the UTC (Coordinated Universal Time) timezone, which is GMT with no daylight saving offset. To display dates in the user's local timezone, simply call one of the `Date` object's conversion getters (such as `toString()`) or assemble the date manually using the getters for each individual date component. You can also pass this `Date` object to a date formatting tool like moment.js.
+
+#### Displaying Cavern-local time (GMT-0700)
+
+Use this code snippet to get a date object that is aligned to Mountain Standard Time, where the D'ni cavern is located:
+
+```javascript
+var dd = new DniDate(2500, 7, 21);
+var surfaceUtc = dd.toSurfaceDate();
+var cavernLocal = new Date(surfaceUtc.getTime() - (7 * 3600000));
+```

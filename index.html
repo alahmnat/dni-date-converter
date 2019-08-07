@@ -227,7 +227,7 @@
 					hahr = hahr * -1;
 				}
 				
-				var cavernDate = new DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn);
+				var cavernDate = new DniDate(hahr, vailee - 1, yahr, gartahvo, tahvo, gorahn, prorahn);
 				var surfaceDate = cavernDate.toSurfaceDate();
 				
 				$("#SurfaceDate").val(surfaceDate.toUTCString());

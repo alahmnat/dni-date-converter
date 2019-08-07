@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>D'ni date converter</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/site.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div id="main">
+				<h2>Date tests</h2>
+				<div class="row">
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>Current date (local time)</label> <input class="form-control" type="text" readonly id="curDate" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>Current date (UTC)</label> <input class="form-control" type="text" readonly id="curDateUtc" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>Current D'ni date</label> <input class="form-control" type="text" readonly id="curDniDate" />
+							</div>
+						</form>
+					</div>
+				</div>
+				
+				<hr />
+				
+				<div class="row">
+					<div class="col-md-6">
+						<form>
+							<div class="form-group">
+								<label>Current date (Local time, back from current D'ni date above)</label> <input class="form-control" type="text" readonly id="curDateLocalConverted" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-6">
+						<form>
+							<div class="form-group">
+								<label>Current date (UTC, back from current D'ni date above)</label> <input class="form-control" type="text" readonly id="curDateUtcConverted" />
+							</div>
+						</form>
+					</div>
+				</div>
+				
+				<hr />
+				
+				<div class="row">
+					<div class="col-md-6">
+						<form>
+							<div class="form-group">
+								<label>DniDate(8, 4, 9) - Leevot 9, 8 DE 0:00:00:00</label> <input class="form-control" type="text" readonly id="fixedDniDateTest" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-6">
+						<form>
+							<div class="form-group">
+								<label>Surface date, from new DniDate(8, 4, 9) - September 27, 7649 BCE</label> <input class="form-control" type="text" readonly id="fixedDniDateTestSurfaceConverted" />
+							</div>
+						</form>
+					</div>
+				</div>
+				
+				<hr />
+				
+				<div class="row">
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>DniDate(9654, 0, 1) - Leefo 1, 9654 DE 0:00:00:00</label> <input class="form-control" type="text" readonly id="leefo1MidnightDni" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>DniDate(9654, 0, 1) - April 21, 1998 CE, 10:35:18 UTC</label> <input class="form-control" type="text" readonly id="leefo1MidnightSurfaceUtc" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>DniDate(9654, 0, 1) - April 21, 1998 CE, Local time</label> <input class="form-control" type="text" readonly id="leefo1MidnightSurfaceLocal" />
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>			
+		</div>
+		
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/DniDate.js"></script>
+		<script type="text/javascript">
+			var d = new Date();
+			$("#curDate").val(d.toString());
+			$("#curDateUtc").val(d.toUTCString());
+			
+			var dd = new DniDate();
+			dd.setFromSurfaceDate(d);
+			
+			$("#curDniDate").val(dd.toString());
+			var bd = dd.toSurfaceDate();
+			$("#curDateLocalConverted").val(bd.toString());
+			$("#curDateUtcConverted").val(bd.toUTCString());
+			
+			var test5 = new DniDate(8, 4, 9);
+			$("#fixedDniDateTest").val(test5.toString());
+			
+			var test6 = new DniDate(8, 4, 9);
+			$("#fixedDniDateTestSurfaceConverted").val(test6.toSurfaceDate().toUTCString());
+			
+			var test7 = new DniDate(9654, 0, 1);
+			$("#leefo1MidnightDni").val(test7.toString());
+			
+			var test8 = new DniDate(9654, 0, 1);
+			var test8Surface = test8.toSurfaceDate();
+			$("#leefo1MidnightSurfaceLocal").val(test8Surface.toString());
+			$("#leefo1MidnightSurfaceUtc").val(test8Surface.toUTCString());
+		</script>
+	</body>
+</html>

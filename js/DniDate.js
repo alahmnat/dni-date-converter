@@ -95,19 +95,20 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         var minute = ~~(r / 60);
         var second = Math.ceil(r - (minute * 60));
 
-        var surfaceDate = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+        var surfaceDate = new Date(Date.UTC(year, month - 1, day, hour + 7, minute, second));
         surfaceDate.setFullYear(year);
         
         return surfaceDate;
     }
 
     function gregorianDateToJulianDayNumber(gDate) {
-        var year = gDate.getFullYear();
-        var month = gDate.getMonth() + 1; // The DniDate output's month may be 0-indexed, but the math isn't
-        var day = gDate.getDate();
+        gDate.setHours(gDate.getUTCHours() - 7);
+        var year = gDate.getUTCFullYear();
+        var month = gDate.getUTCMonth() + 1; // The DniDate output's month may be 0-indexed, but the math isn't
+        var day = gDate.getUTCDate();
         var hour = gDate.getHours();
-        var minute = gDate.getMinutes();
-        var second = gDate.getSeconds();
+        var minute = gDate.getUTCMinutes();
+        var second = gDate.getUTCSeconds();
 
         if (month < 3) {
             month = month + 12;
@@ -142,7 +143,7 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     }
 
     function cavernDateToAtrianDayNumber() {
-        var wholeDays = parseInt(yahr) + ((vailee - 1) * 29) + ((hahr - 9647) * 290);
+        var wholeDays = parseInt(yahr) + (vailee * 29) + ((hahr - 9647) * 290);
         
         var partialDays = ((gartahvo * 15625) + (tahvo * 625) + (gorahn * 25) + prorahn) / 78125;
 
@@ -230,34 +231,24 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         switch (vailee) {
             case 0:
                 return "Leefo";
-                break;
             case 1:
                 return "Leebro";
-                break;
             case 2:
                 return "Leesahn";
-                break;
             case 3:
                 return "Leetar";
-                break;
             case 4:
                 return "Leevot";
-                break;
             case 5:
                 return "Leevofo";
-                break;
             case 6:
                 return "Leevobro";
-                break;
             case 7:
                 return "Leevosahn";
-                break;
             case 8:
                 return "Leevotar";
-                break;
             case 9:
                 return "Leenovoo";
-                break;
         }
     }
 
@@ -280,20 +271,35 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
 
         return julianDayNumberToGregorianDate(jdn);
     }
-
-    this.now = function () {
-        this.setFromSurfaceDate(new Date());
-    }
     
-    if(arguments.length == 0) {
+    if(arguments.length === 0) {
 	    this.setFromSurfaceDate(new Date());
+    } else {
+	    if(vailee === undefined) {
+		    vailee = 0;
+	    }
+	    if(yahr === undefined) {
+		    yahr = 1;
+	    }
+	    if(gartahvo === undefined) {
+		    gartahvo = 0;
+	    }
+	    if(tahvo === undefined) {
+		    tahvo = 0;
+	    }
+	    if(gorahn === undefined) {
+		    gorahn = 0;
+	    }
+	    if(prorahn === undefined) {
+		    prorahn = 0;
+	    }
     }
 
     adjust();
 }
 
 Number.prototype.pad = function(size) {
-      var s = String(this);
-      while (s.length < (size || 1)) {s = "0" + s;}
-      return s;
-    }
+	var s = String(this);
+	while (s.length < (size || 1)) {s = "0" + s;}
+	return s;
+}
