@@ -1,6 +1,6 @@
 /*!
- * D'niDate 1.0
- * Copyright 2016 Gary Buddell
+ * D'niDate 1.1
+ * Copyright 2016–2019 Gary Buddell
  * Formulas provided by Brett Middleton: https://archive.guildofarchivists.org/wiki/D'ni_time_conversion
  * Based on the D'ni time system developed by Richard Watson and Cyan, Inc.
  * Licensed under the MIT license
@@ -213,13 +213,17 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     this.toString = function () {
         return this.toDateString() + " " + this.toTimeString();
     }
+    
+    this.toFontMappedString = function() {
+        return this.toDateString(true) + " " + this.toTimeString();
+    }
 
-    this.toDateString = function () {
+    this.toDateString = function (useDniFontMapping) {
         if (hahr < 0) {
-            return this.getVaileeName() + " " + yahr + " " + (hahr * -1) + " BE";
+            return this.getVaileeName(useDniFontMapping) + " " + yahr + " " + (hahr * -1) + " BE";
         }
         else {
-            return this.getVaileeName() + " " + yahr + " " + hahr + " DE";
+            return this.getVaileeName(useDniFontMapping) + " " + yahr + " " + hahr + " DE";
         }
     }
 
@@ -227,28 +231,28 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         return gartahvo + ":" + tahvo.pad(2) + ":" + gorahn.pad(2) + ":" + prorahn.pad(2);
     }
 
-    this.getVaileeName = function () {
+    this.getVaileeName = function (useDniFontMapping) {
         switch (vailee) {
             case 0:
-                return "Leefo";
+                return useDniFontMapping === true ? "lEfo" : "Leefo";
             case 1:
-                return "Leebro";
+                return useDniFontMapping === true ? "lEbro" : "Leebro";
             case 2:
-                return "Leesahn";
+                return useDniFontMapping === true ? "lEsan" : "Leesahn";
             case 3:
-                return "Leetar";
+                return useDniFontMapping === true ? "lEtar" : "Leetar";
             case 4:
-                return "Leevot";
+                return useDniFontMapping === true ? "lEvot" : "Leevot";
             case 5:
-                return "Leevofo";
+                return useDniFontMapping === true ? "lEvofo" : "Leevofo";
             case 6:
-                return "Leevobro";
+                return useDniFontMapping === true ? "lEvobro" : "Leevobro";
             case 7:
-                return "Leevosahn";
+                return useDniFontMapping === true ? "lEvosan" : "Leevosahn";
             case 8:
-                return "Leevotar";
+                return useDniFontMapping === true ? "lEvotar" : "Leevotar";
             case 9:
-                return "Leenovoo";
+                return useDniFontMapping === true ? "lEnovU" : "Leenovoo";
         }
     }
 

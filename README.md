@@ -49,11 +49,11 @@ Returns a new `Date` object set to the Gregorian calendar equivalent of the `Dni
 #### Getters
 
 * `getHahr()`
-* `getVailee()` (returns a value between 0 and 9 representing the numerical vailee value)
-* `getVaileeName()` (returns the actual vailee name as a string value, written in [OTS](https://archive.guildofarchivists.org/wiki/D%27ni_(language)#Old_Transliteration_Standard)).
+* `getVailee()` (Returns a value between 0 and 9 representing the numerical vailee value.)
+* `getVaileeName(useDniFontMapping)` (Returns the actual vailee name as a string value. When `useDniFontMapping` is true, the output can be mapped to the webfont version of Cyan's Dnifont font. When `useDniFontMapping` is false, the output is written in [OTS](https://archive.guildofarchivists.org/wiki/D%27ni_(language)#Old_Transliteration_Standard).)
 * `getYahr()`
 * `getGartahvo()`
-* `getPartahvo()` (not commonly used; this value divides the D'ni yahr into 5 segments, rather than the tahvo's 25)
+* `getPartahvo()` (Not commonly used; this value divides the D'ni yahr into 5 segments, rather than the tahvo's 25.)
 * `getTahvo()`
 * `getGorahn()`
 * `getProrahn()`
@@ -61,7 +61,7 @@ Returns a new `Date` object set to the Gregorian calendar equivalent of the `Dni
 #### Setters
 
 * `setHahr()`
-* `setVailee()` (uses 0-indexed values)
+* `setVailee()` (Uses 0-indexed values.)
 * `setGartahvo()`
 * `setTahvo()`
 * `setGorahn()`

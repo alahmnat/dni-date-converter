@@ -55,17 +55,24 @@
 				<hr />
 				
 				<div class="row">
-					<div class="col-md-6">
+					<div class="col-md-4">
 						<form>
 							<div class="form-group">
-								<label>DniDate(8, 4, 9) - Leevot 9, 8 DE 0:00:00:00</label> <input class="form-control" type="text" readonly id="fixedDniDateTest" />
+								<label><br />DniDate(8, 4, 9) - Leevot 9, 8 DE 0:00:00:00</label> <input class="form-control" type="text" readonly id="fixedDniDateTest" />
 							</div>
 						</form>
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-4">
 						<form>
 							<div class="form-group">
-								<label>Surface date, from new DniDate(8, 4, 9) - September 27, 7649 BCE</label> <input class="form-control" type="text" readonly id="fixedDniDateTestSurfaceConverted" />
+								<label>D'ni date, from new DniDate(8, 4, 9) - September 27, 7649 BCE</label> <input class="form-control" type="text" readonly id="fixedDniDateTestSurfaceConverted" />
+							</div>
+						</form>
+					</div>
+					<div class="col-md-4">
+						<form>
+							<div class="form-group">
+								<label>D'ni date with font mapping, from new DniDate(8, 4, 9) - September 27, 7649 BCE</label> <input class="form-control" type="text" readonly id="fixedDniDateTestFontMapping" />
 							</div>
 						</form>
 					</div>
@@ -128,6 +135,9 @@
 			var test8Surface = test8.toSurfaceDate();
 			$("#leefo1MidnightSurfaceLocal").val(test8Surface.toString());
 			$("#leefo1MidnightSurfaceUtc").val(test8Surface.toUTCString());
+			
+			var test9 = new DniDate(8, 4, 9);
+			$("#fixedDniDateTestFontMapping").val(test9.toFontMappedString());
 		</script>
 	</body>
 </html>
