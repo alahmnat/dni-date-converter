@@ -1,7 +1,8 @@
 /*!
- * D'niDate 1.1
+ * D'niDate 2.0
  * Copyright 2016–2019 Gary Buddell
- * Formulas provided by Brett Middleton: https://archive.guildofarchivists.org/wiki/D'ni_time_conversion
+ * Based on code created by RIUM+, Jehon the Scribe, and rokama
+ * Additional contributions by Brett Middleton: https://archive.guildofarchivists.org/wiki/D'ni_time_conversion
  * Based on the D'ni time system developed by Richard Watson and Cyan, Inc.
  * Licensed under the MIT license
  */
@@ -13,6 +14,12 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     var tahvo = tahvo;
     var gorahn = gorahn;
     var prorahn = prorahn;
+    
+    var refTimeStamp = makeSurfaceTimeStamp(1991, 04, 21, 16, 54, 00);
+    var refDniHahr = 9647;
+    var msPerHahr = 31556925216;
+    var prorahnteePerHahr = 10 * 29 * 5 * 25 * 25 * 25;       // = 22656250
+    var refProrahnteePerHahr = 9647 * 290 * 5 * 25 * 25 * 25;
 
     function adjust() {
         while (this.prorahn > 25) {
@@ -69,85 +76,21 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
             this.hahr = this.hahr - 1;
         }
     }
-
-    function julianDayNumberToGregorianDate(jdn) {
-        var z = Math.floor(jdn);
-        var g = z - 0.25;
-        var a = Math.floor(g / 36524.25);
-        var b = a - (0.25 * a);
-        var year = Math.floor((g + b) / 365.25);
-        var c = z + b - Math.floor(365.25 * year);
-        var month = ~~(((5 * c) + 456) / 153);
-        var day = Math.ceil(c - ~~(((153 * month) - 457) / 5));
-
-        if (month > 12) {
-            year = year + 1;
-            month = month - 12;
-        }
-
-        if (year < 1) {
-            year = year - 1;
-        }
-
-        z = (jdn - Math.floor(jdn)) * 86400;
-        var hour = ~~(z / 3600);
-        var r = z - (hour * 3600);
-        var minute = ~~(r / 60);
-        var second = Math.ceil(r - (minute * 60));
-
-        var surfaceDate = new Date(Date.UTC(year, month - 1, day, hour + 7, minute, second));
-        surfaceDate.setFullYear(year);
-        
-        return surfaceDate;
-    }
-
-    function gregorianDateToJulianDayNumber(gDate) {
-        gDate.setHours(gDate.getUTCHours() - 7);
-        var year = gDate.getUTCFullYear();
-        var month = gDate.getUTCMonth() + 1; // The DniDate output's month may be 0-indexed, but the math isn't
-        var day = gDate.getUTCDate();
-        var hour = gDate.getHours();
-        var minute = gDate.getUTCMinutes();
-        var second = gDate.getUTCSeconds();
-
-        if (month < 3) {
-            month = month + 12;
-            year = year - 1;
-        }
-
-        var wholeDays = day + parseFloat(~~(((153 * month) - 457) / 5)) + parseFloat(Math.floor(365.25 * year)) - parseFloat(Math.floor(0.01 * year)) + parseFloat(Math.floor(0.0025 * year));
-
-        var partialDays = ((hour * 3600) + (minute * 60) + second) / 86400;
-
-        return wholeDays + partialDays;
-    }
-
-    function setAtrianDayNumberToCavernDate(adn) {
-        var z = parseFloat(Math.floor(adn));
-        var g = z - 0.25;
-        var a = parseFloat(Math.floor(g / 290));
-        hahr = 9647 + a;
-        var c = z - (a * 290);
-        vailee = parseFloat(Math.floor((c - 0.25) / 29)) + 1;
-        yahr = c - ((vailee - 1) * 29);
-
-        z = (adn - Math.floor(adn)) * 78125;
-        gartahvo = ~~(z / 15625);
-        var r = z - (gartahvo * 15625);
-        tahvo = ~~(r / 625);
-        r = r - (tahvo * 625);
-        gorahn = ~~(r / 25);
-        prorahn = Math.floor(r - (gorahn * 25));
-        
-        vailee = vailee - 1;
-    }
-
-    function cavernDateToAtrianDayNumber() {
-        var wholeDays = parseInt(yahr) + (vailee * 29) + ((hahr - 9647) * 290);
-        
-        var partialDays = ((gartahvo * 15625) + (tahvo * 625) + (gorahn * 25) + prorahn) / 78125;
-
-        return wholeDays + partialDays;
+    
+    function makeSurfaceTimeStamp(year, month, day, hour, minute, second) {
+        // convert a UTC date-time to a JavaScript timestamp
+        month = parseInt(month);              // ensure that month & day are ints, not strings
+        day = parseInt(day);
+        if (month < 10) month = '0' + month;  // ensure that month & day are two-digit strings
+        if (day < 10) day = '0' + day;        // otherwise Date.parse() fails
+        //var temp = Date.parse(year + '-' + month + '-' + day) + ((hour * 60 + minute) * 60 + second) * 1000;
+        var dt = new Date(year, month -1, day);
+        dt.setUTCHours(hour);
+        dt.setUTCMinutes(minute);
+        dt.setUTCSeconds(second);
+        var temp = Date.parse(dt.toISOString());
+        return temp;
+        //return AdjustForLeapSeconds(temp);
     }
 
     this.getHahr = function () {
@@ -214,6 +157,18 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         return this.toDateString() + " " + this.toTimeString();
     }
     
+    this.toCavernDateTimeString = function () {
+        var tempTime = this;
+        var tempSurfaceTime = this.toSurfaceDate();
+        tempSurfaceTime.setMinutes(tempSurfaceTime.getMinutes() - tempSurfaceTime.getTimezoneOffset() + (7 * 60));
+        return tempSurfaceTime.toDateString() + " " + tempSurfaceTime.toTimeString();
+    }
+    
+    this.valueOf = function() {
+        var sd = this.toSurfaceDate();
+        return sd.valueOf();
+    }
+    
     this.toFontMappedString = function() {
         return this.toDateString(true) + " " + this.toTimeString();
     }
@@ -256,24 +211,56 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         }
     }
 
-    this.setFromSurfaceDate = function (surface) {
-        var jdn = gregorianDateToJulianDayNumber(surface);
-        var jdd = jdn - 727249.745833333;
-        var add = jdd * 0.793993705929756;
+    this.setFromSurfaceDate = function (surface, isUTC) {
+        if (surface === undefined) {
+            surface = new Date();
+        }
+        // Treat the input date as UTC? This means the input date is read as the UTC date, so April 21, 1991 16:54:00 UTC is 0 DE Leefo 1 0:0:0:0
+        if (isUTC === true) {
+            surface.setMinutes(surface.getMinutes() - surface.getTimezoneOffset());
+        } else { 
+            // Using Cavern-local time (UTC-0700)
+            surface.setMinutes(surface.getMinutes() - surface.getTimezoneOffset() + (7 * 60));
+        }
 
-        var adn = add + 1;
-
-        setAtrianDayNumberToCavernDate(adn);
+        var delta = surface - refTimeStamp;
+        // calculate elapsed hahrtee from milliseconds delta
+        hahr = Math.floor(delta / msPerHahr);
+        delta -= hahr * msPerHahr;
+        // convert milliseconds delta to prorahntee delta
+        delta *= prorahnteePerHahr / msPerHahr;
+        // calculate all the D'ni units from the prorahntee delta
+        vailee = Math.floor(delta / (29 * 5 * 25 * 25 * 25));
+        delta -= vailee * (29 * 5 * 25 * 25 * 25);
+        yahr = Math.floor(delta / (5 * 25 * 25 * 25));
+        delta -= yahr * (5 * 25 * 25 * 25);
+        gartahvo = Math.floor(delta / (25 * 25 * 25));
+        delta -= gartahvo * (25 * 25 * 25);
+        tahvo = Math.floor(delta / (25 * 25));
+        delta -= tahvo * (25 * 25);
+        gorahn = Math.floor(delta / 25);
+        delta -= gorahn * 25;
+        prorahn = Math.floor(delta);
+        
+        adjust();
+        
+        // add reference D'ni hahr (year) and make yahr (day) 1-based instead of 0-based
+        hahr += refDniHahr;
+        yahr++;
     }
 
     this.toSurfaceDate = function () {
-        var adn = cavernDateToAtrianDayNumber();
-        var add = adn - 1;
-
-        var jdd = add * 1.25945582758621;
-        var jdn = jdd + 727249.745833333;
-
-        return julianDayNumberToGregorianDate(jdn);
+        // Convert current values for D'ni date to prorahntee (essentially, time since 1 Leefo 0 DE 0:0:0:0)
+        var dTimeInProrahntee = (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + (vailee * (yahr-1) * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
+        // Subtract from reference date prorahntee
+        var dTimeDelta = refProrahnteePerHahr - dTimeInProrahntee;        
+        // Multiply by milliseconds per prorahn (1392.8573857142859)
+        dTimeDelta = dTimeDelta * 1392.8573857142859; // ms per prorahn        
+        // Subtract milliseconds from reference timestamp
+        dTimeDelta = refTimeStamp - dTimeDelta;        
+        // Convert new delta value to surface date
+        var surfaceDate = new Date(dTimeDelta);
+        return surfaceDate;
     }
     
     if(arguments.length === 0) {

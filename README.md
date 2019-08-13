@@ -30,8 +30,8 @@ var dd = new DniDate(); // Date will be set to the current D'ni date and time
 
 ### Instance methods
 #### Converters
-##### `setFromSurfaceDate(dateObject)`
-Sets the `DniDate` object to the D'ni date and time that matches the supplied JavaScript `Date` object.
+##### `setFromSurfaceDate(dateObject[, isUTC])`
+Sets the `DniDate` object to the D'ni date and time that matches the supplied JavaScript `Date` object. By default, the time of the specified date is converted to Cavern Time (UTC-0700) before being converted. If you want the time of your specified date to be treated as UTC by the converter, set the `isUTC` parameter to `true`.
 
 **NOTE**: If you try to create a Gregorian date between 1 CE and 99 CE (1 - 99) by calling `new Date(year, month, day)`, the `Date` object will "helpfully" set your date in the 20th century (1901 - 1999). To avoid this, create the `Date` object, then call `setFullYear()` with your desired year before passing it into `DniDate`:
 
@@ -44,13 +44,17 @@ dd.setFromSurfaceDate(surfaceDate);
 ```
 
 ##### `toSurfaceDate()`
-Returns a new `Date` object set to the Gregorian calendar equivalent of the `DniDate`'s date and time.
+Returns a new `Date` object set to the Gregorian calendar equivalent of the `DniDate`'s date and time. The time of this object is aligned so that calling `.toUTCString()` will provide the proper UTC time, and adjusting the value down by 7 hours will provide the proper D'ni Cavern date.
+
+##### `toCavernDateTimeString()`
+
+Returns a full date and time string containing the Gregorian equivalent of the configured D'ni date in the Cavern's local time zone (UTC-0700).
 
 #### Getters
 
 * `getHahr()`
 * `getVailee()` (Returns a value between 0 and 9 representing the numerical vailee value.)
-* `getVaileeName(useDniFontMapping)` (Returns the actual vailee name as a string value. When `useDniFontMapping` is true, the output can be mapped to the webfont version of Cyan's Dnifont font. When `useDniFontMapping` is false, the output is written in [OTS](https://archive.guildofarchivists.org/wiki/D%27ni_(language)#Old_Transliteration_Standard).)
+* `getVaileeName([useDniFontMapping])` (Returns the actual vailee name as a string value. When `useDniFontMapping` is `true`, the output can be mapped to the webfont version of Cyan's Dnifont font. When `useDniFontMapping` is `false`, the output is written in [OTS](https://archive.guildofarchivists.org/wiki/D%27ni_(language)#Old_Transliteration_Standard). The default value for `useDniFontMapping` is `false`.)
 * `getYahr()`
 * `getGartahvo()`
 * `getPartahvo()` (Not commonly used; this value divides the D'ni yahr into 5 segments, rather than the tahvo's 25.)
@@ -73,9 +77,9 @@ You may notice that there is a `getPartahvo()`, method, but no `setPartahvo()` m
 
 #### Formatters
 
-##### `toDateString()`
+##### `toDateString([useDniFontMapping])`
 
-Returns a string with the vailee name, yahr, and hahr (month, day, year), as well as the era (BE or DE).
+Returns a string with the vailee name, yahr, and hahr (month, day, year), as well as the era (BE or DE). When `useDniFontMapping` is set to `true`, the vailee name will be formatted to display properly in conjunction with Cyan's Dnifont font. Otherwise, it will use the capitalized OTS transliteration.
 
 ##### `toTimeString()`
 
@@ -84,6 +88,14 @@ Returns the gartahvo, tahvo, gorahn, and prorahn, separated by colons. The tahvo
 ##### `toString()`
 
 Overrides the default `Object` behavior and returns a single string with both date and time values, concatenated together by a space.
+
+##### `toFontMappedString()`
+
+Outputs the same content as `toString()`, but with the vailee formatted to display properly in conjunction with Cyan's Dnifont font.
+
+##### `valueOf()`
+
+Automatically converts the date to Gregorian time and outputs the built-in `Date()` object's `valueOf()` value, which is the number of milliseconds between 1 January 1970 00:00:00 UTC and the given date.
 
 ### Dealing with timezones
 
@@ -95,7 +107,7 @@ D'ni has only one timezone, which is aligned to UTC-0700 (Mountain Standard Time
 
 The surface dates returned by `toSurfaceDate()` are aligned to the UTC (Coordinated Universal Time) timezone, which is GMT with no daylight saving offset. To display dates in the user's local timezone, simply call one of the `Date` object's conversion getters (such as `toString()`) or assemble the date manually using the getters for each individual date component. You can also pass this `Date` object to a date formatting tool like moment.js.
 
-#### Displaying Cavern-local time (GMT-0700)
+#### Displaying Cavern-local time (UTC-0700)
 
 Use this code snippet to get a date object that is aligned to Mountain Standard Time, where the D'ni cavern is located:
 
