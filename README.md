@@ -1,6 +1,6 @@
 # dni-date-converter
 
-The D'ni Date Converter is a JavaScript implementation of the D'ni↔Gregorian calendar conversion algorithms originally developed by Brett Middleton. Details about the algorithms themselves can be found [here](https://archive.guildofarchivists.org/wiki/D%27ni_time_conversion).
+The D'ni Date Converter is a JavaScript D'ni↔Gregorian calendar conversion algorithm, based on the [D'ni Clock](http://jsfiddle.net/154e70as/3/) script created by Jehon the Scribe, RIUM+, and rokama. Additional content drawn from [algorithms](https://archive.guildofarchivists.org/wiki/D%27ni_time_conversion) created by Brett Middleton.
 
 This project contains both the converter and a website which can be used to convert arbitrary dates between the two calendar systems. To use the date converter in your own project, you will only need `js/DniDate.js`. 
 
