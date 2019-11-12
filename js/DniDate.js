@@ -251,7 +251,7 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
 
     this.toSurfaceDate = function () {
         // Convert current values for D'ni date to prorahntee (essentially, time since 1 Leefo 0 DE 0:0:0:0)
-        var dTimeInProrahntee = (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + (vailee * (yahr-1) * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
+        var dTimeInProrahntee = (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + (yahr * 5 * 25 * 25 * 25) + ((vailee - 1) * 29 * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
         // Subtract from reference date prorahntee
         var dTimeDelta = refProrahnteePerHahr - dTimeInProrahntee;        
         // Multiply by milliseconds per prorahn (1392.8573857142859)
