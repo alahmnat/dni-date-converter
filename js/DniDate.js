@@ -15,65 +15,65 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     var gorahn = gorahn;
     var prorahn = prorahn;
     
-    var refTimeStamp = makeSurfaceTimeStamp(1991, 04, 21, 16, 54, 00);
+    var refTimeStamp = makeSurfaceTimeStamp(1991, 04, 21, 16, 54, 00); // This timestamp is in UTC
     var refDniHahr = 9647;
     var msPerHahr = 31556925216;
     var prorahnteePerHahr = 10 * 29 * 5 * 25 * 25 * 25;       // = 22656250
     var refProrahnteePerHahr = 9647 * 290 * 5 * 25 * 25 * 25;
 
     function adjust() {
-        while (this.prorahn > 25) {
-            this.prorahn = this.prorahn - 25;
-            this.gorahn = this.gorahn + 1;
+        while (prorahn > 25) {
+            prorahn = prorahn - 25;
+            gorahn = gorahn + 1;
         }
-        while (this.prorahn < 0) {
-            this.prorahn = this.prorahn + 25;
-            this.gorahn = this.gorahn - 1;
-        }
-
-        while (this.gorahn > 25) {
-            this.gorahn = this.gorahn - 25;
-            this.tahvo = this.tahvo + 1;
-        }
-        while (this.gorahn < 0) {
-            this.gorahn = this.gorahn + 25;
-            this.tahvo = this.tahvo - 1;
+        while (prorahn < 0) {
+            prorahn = prorahn + 25;
+            gorahn = gorahn - 1;
         }
 
-        while (this.tahvo > 25) {
-            this.tahvo = this.tahvo - 25;
-            this.gartahvo = this.gartahvo + 1;
+        while (gorahn > 25) {
+            gorahn = gorahn - 25;
+            tahvo = tahvo + 1;
         }
-        while (this.tahvo < 0) {
-            this.tahvo = this.tahvo + 25;
-            this.gartahvo = this.gartahvo - 1;
-        }
-
-        while (this.gartahvo > 5) {
-            this.gartahvo = this.gartahvo - 25;
-            this.yahr = this.yahr + 1;
-        }
-        while (this.gartahvo < 0) {
-            this.gartahvo = this.gartahvo + 5;
-            this.yahr = this.yahr - 1;
+        while (gorahn < 0) {
+            gorahn = gorahn + 25;
+            tahvo = tahvo - 1;
         }
 
-        while (this.yahr > 29) {
-            this.yahr = this.yahr - 29;
-            this.vailee = this.vailee + 1;
+        while (tahvo > 25) {
+            tahvo = tahvo - 25;
+            gartahvo = gartahvo + 1;
         }
-        while (this.yahr < 0) {
-            this.yahr = this.yahr + 29;
-            this.vailee = this.vailee - 1;
+        while (tahvo < 0) {
+            tahvo = tahvo + 25;
+            gartahvo = gartahvo - 1;
         }
 
-        while (this.vailee > 9) {
-            this.vailee = this.vailee - 10;
-            this.hahr = this.hahr + 1;
+        while (gartahvo > 5) {
+            gartahvo = gartahvo - 5;
+            yahr = yahr + 1;
         }
-        while (this.vailee < 0) {
-            this.vailee = this.vailee + 10;
-            this.hahr = this.hahr - 1;
+        while (gartahvo < 0) {
+            gartahvo = gartahvo + 5;
+            yahr = yahr - 1;
+        }
+
+        while (yahr > 29) {
+            yahr = yahr - 29;
+            vailee = vailee + 1;
+        }
+        while (yahr < 0) {
+            yahr = yahr + 29;
+            vailee = vailee - 1;
+        }
+
+        while (vailee > 9) {
+            vailee = vailee - 10;
+            hahr = hahr + 1;
+        }
+        while (vailee < 0) {
+            vailee = vailee + 10;
+            hahr = hahr - 1;
         }
     }
     
@@ -215,20 +215,20 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         if (surface === undefined) {
             surface = new Date();
         }
-        // Treat the input date as UTC? This means the input date is read as the UTC date, so April 21, 1991 16:54:00 UTC is 0 DE Leefo 1 0:0:0:0
+        // Treat the input date as UTC? This means the input date is read as the UTC date, so April 21, 1991 16:54:00 UTC is 0 DE Leefo 9647 0:0:0:0
         if (isUTC === true) {
-            surface.setMinutes(surface.getMinutes() - surface.getTimezoneOffset());
+            surface.setMinutes(surface.getMinutes() + surface.getTimezoneOffset());
         } else { 
             // Using Cavern-local time (UTC-0700)
-            surface.setMinutes(surface.getMinutes() - surface.getTimezoneOffset() + (7 * 60));
+            surface.setMinutes(surface.getMinutes() + (surface.getTimezoneOffset() - (7 * 60)));
         }
 
-        var delta = surface - refTimeStamp;
+        var delta = surface.getTime() - refTimeStamp;
         // calculate elapsed hahrtee from milliseconds delta
         hahr = Math.floor(delta / msPerHahr);
         delta -= hahr * msPerHahr;
         // convert milliseconds delta to prorahntee delta
-        delta *= prorahnteePerHahr / msPerHahr;
+        delta = delta * (prorahnteePerHahr / msPerHahr);
         // calculate all the D'ni units from the prorahntee delta
         vailee = Math.floor(delta / (29 * 5 * 25 * 25 * 25));
         delta -= vailee * (29 * 5 * 25 * 25 * 25);
@@ -250,16 +250,18 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     }
 
     this.toSurfaceDate = function () {
+        var localDate = new Date();
         // Convert current values for D'ni date to prorahntee (essentially, time since 1 Leefo 0 DE 0:0:0:0)
-        var dTimeInProrahntee = (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + (yahr * 5 * 25 * 25 * 25) + ((vailee - 1) * 29 * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
+        var dTimeInProrahntee = prorahn + (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + ((yahr - 1) * 5 * 25 * 25 * 25) + ((vailee - 1) * 29 * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
         // Subtract from reference date prorahntee
         var dTimeDelta = refProrahnteePerHahr - dTimeInProrahntee;        
         // Multiply by milliseconds per prorahn (1392.8573857142859)
         dTimeDelta = dTimeDelta * 1392.8573857142859; // ms per prorahn        
         // Subtract milliseconds from reference timestamp
-        dTimeDelta = refTimeStamp - dTimeDelta;        
-        // Convert new delta value to surface date
+        dTimeDelta = refTimeStamp - dTimeDelta;
+        // Convert new delta value to surface date (UTC)
         var surfaceDate = new Date(dTimeDelta);
+                
         return surfaceDate;
     }
     
