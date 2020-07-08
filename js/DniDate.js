@@ -1,5 +1,5 @@
 /*!
- * D'niDate 2.1
+ * D'niDate 2.1.1
  * Copyright 2016–2020 Gary Buddell
  * Based on code created by RIUM+, Jehon the Scribe, and rokama: http://jsfiddle.net/154e70as/3/
  * Additional contributions by Brett Middleton: https://archive.guildofarchivists.org/wiki/D'ni_time_conversion
