@@ -71,6 +71,9 @@
 												<input type="number" id="GregorianDateMinute" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="59" />
 											</div>
 										</div>
+										<div class="col-auto m-0 p-0">
+											:
+										</div>
 										<div class="col-auto">
 											<div class="input-group">
 												<input type="number" id="GregorianDateSecond" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="59" />
@@ -317,8 +320,8 @@
 				var surfaceDate = cavernDate.toSurfaceDate();
 				
 				$("#SurfaceDate").val(surfaceDate.toUTCString());
-				$("#SurfaceDateLocal").val(surfaceDate.toString());
 				$("#SurfaceDateCavern").val(cavernDate.toCavernDateTimeString());
+				$("#SurfaceDateLocal").val(surfaceDate.toString());
 			});
 		</script>
 	</body>

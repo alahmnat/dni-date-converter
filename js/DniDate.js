@@ -1,7 +1,7 @@
 /*!
  * D'niDate 2.1
  * Copyright 2016–2020 Gary Buddell
- * Based on code created by RIUM+, Jehon the Scribe, and rokama
+ * Based on code created by RIUM+, Jehon the Scribe, and rokama: http://jsfiddle.net/154e70as/3/
  * Additional contributions by Brett Middleton: https://archive.guildofarchivists.org/wiki/D'ni_time_conversion
  * Based on the D'ni time system developed by Richard Watson and Cyan, Inc.
  * Licensed under the MIT license
@@ -15,9 +15,14 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     var gorahn = gorahn;
     var prorahn = prorahn;
     
-    var LeapSecTimeStamps = [2272060800, 2287785600, 2303683200, 2335219200, 2366755200, 2398291200, 2429913600, 2461449600, 2492985600, 2524521600, 2571782400, 2603318400, 2634854400, 2698012800, 2776982400, 2840140800, 2871676800, 2918937600, 2950473600, 2982009600, 3029443200, 3076704000, 3124137600, 3345062400, 3439756800, 3550089600, 3644697600];
+    // List of leap second timestamps from 1972-01-01 to 2017-01-01.
+    // These timestamps are in units of seconds since the NTP epoch, which is 1900-01-01 00:00:00,
+    // and it is assumed that the number of leap seconds always increases by 1 for each entry.
+    // Must be converted to JavaScript / Unix timestamps! (Done by ConvertLeapSecTimeStamps())
+    // source: https://www.ietf.org/timezones/data/leap-seconds.list
+    var LeapSecTimeStamps = [2272060800, 2287785600, 2303683200, 2335219200, 2366755200, 2398291200, 2429913600, 2461449600, 2492985600, 2524521600, 2571782400, 2603318400, 2634854400, 2698012800, 2776982400, 2840140800, 2871676800, 2918937600, 2950473600, 2982009600, 3029443200, 3076704000, 3124137600, 3345062400, 3439756800, 3550089600, 3644697600, 3692217600];
     ConvertLeapSecTimeStamps();
-    var LeapSecOffset = 10;
+    var LeapSecOffset = 10; // first entry, 1972-01-01, starts at 10 leap seconds
     
     var refTimeStamp = makeSurfaceTimeStamp(1991, 4, 21, 16, 54, 0); // This timestamp is in UTC
     var refDniHahr = 9647;
@@ -115,6 +120,15 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         if (leapSecs > 0) leapSecs += LeapSecOffset - 1;
         return TimeStamp + leapSecs * 1000;
     }
+    
+    function DejustForLeapSeconds(TimeStamp) {
+        // adjust a JavaScript timestamp for leap seconds
+        var leapSecs = 0;
+        var arrayLen = LeapSecTimeStamps.length;
+        for (var i = 0; i < arrayLen && TimeStamp >= LeapSecTimeStamps[i]; leapSecs++, i++);
+        if (leapSecs > 0) leapSecs += LeapSecOffset - 1;
+        return TimeStamp - leapSecs * 1000;
+    }
 
     this.getHahr = function () {
         return hahr;
@@ -183,8 +197,8 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     this.toCavernDateTimeString = function () {
         var tempTime = this;
         var tempSurfaceTime = this.toSurfaceDate();
-        tempSurfaceTime.setMinutes(tempSurfaceTime.getMinutes() - tempSurfaceTime.getTimezoneOffset() + (7 * 60));
-        return tempSurfaceTime.toDateString() + " " + tempSurfaceTime.toTimeString();
+        tempSurfaceTime.setUTCMinutes(tempSurfaceTime.getUTCMinutes() - (7 * 60));
+        return tempSurfaceTime.toDateString() + " " + tempSurfaceTime.getUTCHours().pad(2) + ":" + tempSurfaceTime.getUTCMinutes().pad(2) + ":" + tempSurfaceTime.getUTCSeconds().pad(2) + " GMT-0700";
     }
     
     this.valueOf = function() {
@@ -240,10 +254,10 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         }
         // Treat the input date as UTC? This means the input date is read as the UTC date, so April 21, 1991 16:54:00 UTC is 0 DE Leefo 9647 0:0:0:0
         if (isUTC === true) {
-            surface.setMinutes(surface.getMinutes() + surface.getTimezoneOffset());
+            surface.setUTCMinutes(surface.getUTCMinutes() - surface.getTimezoneOffset());
         } else { 
             // Using Cavern-local time (UTC-0700)
-            surface.setMinutes(surface.getMinutes() + (surface.getTimezoneOffset() - (7 * 60)));
+            surface.setUTCMinutes(surface.getUTCMinutes() - surface.getTimezoneOffset() + (7 * 60));
         }
         
         var surfaceTimeStamp = makeSurfaceTimeStamp(surface.getUTCFullYear(), surface.getUTCMonth() + 1, surface.getUTCDate(), surface.getUTCHours(), surface.getUTCMinutes(), surface.getUTCSeconds());
@@ -275,7 +289,6 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     }
 
     this.toSurfaceDate = function () {
-        adjust();
         // Convert current values for D'ni date to prorahntee (essentially, time since 1 Leefo 0 DE 0:0:0:0)
         var dTimeInProrahntee = prorahn + (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + ((yahr - 1) * 5 * 25 * 25 * 25) + ((vailee - 1) * 29 * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
         // Subtract from reference date prorahntee
@@ -287,7 +300,7 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         // Convert new delta value to surface date (UTC)
         var surfaceDate = new Date(dTimeDelta);
         // Account for leap seconds in more contemporary dates
-        surfaceDate = new Date(AdjustForLeapSeconds(surfaceDate.getTime()));
+        surfaceDate = new Date(DejustForLeapSeconds(surfaceDate.getTime()));
 
         return surfaceDate;
     }
