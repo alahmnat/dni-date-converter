@@ -69,6 +69,11 @@
 										<div class="col-auto">
 											<div class="input-group">
 												<input type="number" id="GregorianDateMinute" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="59" />
+											</div>
+										</div>
+										<div class="col-auto">
+											<div class="input-group">
+												<input type="number" id="GregorianDateSecond" class="form-control pad-numbers" maxlength="2" value="00" min="0" max="59" />
 												<div class="input-group-append" id="MeridianSelector">
 												    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">AM</button>
 												    <div class="dropdown-menu">
@@ -200,7 +205,7 @@
 				<h2>Notes</h2> 
 				<h3>Accuracy</h3>
 				<p>
-					This date converter is not necessarily accurate to the second/prorahn, as it does not account for leap seconds in the modern Gregorian calendar.
+					While this date converter does account for leap seconds, it may not be perfectly accurate down to the exact second/prorahn when converting dates back and forth, especially over large time scales.
 				</p>
 				<h3>The distant past</h3>
 				<p>
@@ -215,7 +220,7 @@
 				<div class="row">
 					<div class="col-md-12 text-center">
 						<p>
-							Implementation by <a href="http://www.twitter.com/alahmnat">@alahmnat</a>. Based on <a href="http://jsfiddle.net/154e70as/3/">work</a> by RIUM+, Jehon the Scribe, and rokama. Additional contributions by Brett Middleton.<br /> 
+							Implementation by <a href="http://www.twitter.com/alahmnat">@alahmnat</a>. Based on <a href="http://jsfiddle.net/154e70as/">work</a> by RIUM+, Jehon the Scribe, and rokama. Additional contributions by Brett Middleton.<br /> 
 							More information is available <a href="https://archive.guildofarchivists.org/wiki/D%27ni_time_conversion">here</a>.
 						</p>
 					</div>
@@ -233,13 +238,13 @@
 			var dniEra = "DE";
 			var meridian = "AM";
 			
-			$("#SurfaceEraSelector li").on("click", function() {
-				$("#SurfaceEraSelector button span:first-child").text($(this).text());
+			$("#SurfaceEraSelector a").on("click", function() {
+				$("#SurfaceEraSelector button:first-child").text($(this).text());
 				surfaceEra = $(this).text();
 			});
 			
-			$("#DniEraSelector li").on("click", function() {
-				$("#DniEraSelector button span:first-child").text($(this).text());
+			$("#DniEraSelector a").on("click", function() {
+				$("#DniEraSelector button:first-child").text($(this).text());
 				dniEra = $(this).text();
 			});
 			
@@ -267,14 +272,17 @@
 				var day = parseFloat($("#GregorianDateDay").val());
 				var hour = parseFloat($("#GregorianDateHour").val());
 				var minute = parseFloat($("#GregorianDateMinute").val());
-				var second = 0;
+				var second = parseFloat($("#GregorianDateSecond").val());
 				
 				if(surfaceEra == "BCE") {
 					year = -1 * year + 1;
 				}
 				
-				if(meridian === "PM") {
+				if(meridian === "PM" && hour < 12) {
 					hour = hour + 12;
+				}
+				if(meridian === "AM" && hour === 12) {
+					hour = 0;
 				}
 				
 				var surfaceDate = new Date(year, month - 1, day, hour, minute, second);

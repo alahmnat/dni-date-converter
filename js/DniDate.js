@@ -1,6 +1,6 @@
 /*!
- * D'niDate 2.0
- * Copyright 2016–2019 Gary Buddell
+ * D'niDate 2.1
+ * Copyright 2016–2020 Gary Buddell
  * Based on code created by RIUM+, Jehon the Scribe, and rokama
  * Additional contributions by Brett Middleton: https://archive.guildofarchivists.org/wiki/D'ni_time_conversion
  * Based on the D'ni time system developed by Richard Watson and Cyan, Inc.
@@ -15,10 +15,15 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     var gorahn = gorahn;
     var prorahn = prorahn;
     
-    var refTimeStamp = makeSurfaceTimeStamp(1991, 04, 21, 16, 54, 00); // This timestamp is in UTC
+    var LeapSecTimeStamps = [2272060800, 2287785600, 2303683200, 2335219200, 2366755200, 2398291200, 2429913600, 2461449600, 2492985600, 2524521600, 2571782400, 2603318400, 2634854400, 2698012800, 2776982400, 2840140800, 2871676800, 2918937600, 2950473600, 2982009600, 3029443200, 3076704000, 3124137600, 3345062400, 3439756800, 3550089600, 3644697600];
+    ConvertLeapSecTimeStamps();
+    var LeapSecOffset = 10;
+    
+    var refTimeStamp = makeSurfaceTimeStamp(1991, 4, 21, 16, 54, 0); // This timestamp is in UTC
     var refDniHahr = 9647;
     var msPerHahr = 31556925216;
     var prorahnteePerHahr = 10 * 29 * 5 * 25 * 25 * 25;       // = 22656250
+    var msPerProrahn = msPerHahr / prorahnteePerHahr;
     var refProrahnteePerHahr = 9647 * 290 * 5 * 25 * 25 * 25;
 
     function adjust() {
@@ -83,14 +88,32 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         day = parseInt(day);
         if (month < 10) month = '0' + month;  // ensure that month & day are two-digit strings
         if (day < 10) day = '0' + day;        // otherwise Date.parse() fails
-        //var temp = Date.parse(year + '-' + month + '-' + day) + ((hour * 60 + minute) * 60 + second) * 1000;
+        
         var dt = new Date(year, month -1, day);
         dt.setUTCHours(hour);
         dt.setUTCMinutes(minute);
         dt.setUTCSeconds(second);
         var temp = Date.parse(dt.toISOString());
-        return temp;
-        //return AdjustForLeapSeconds(temp);
+        return AdjustForLeapSeconds(temp);
+    }
+    
+    function ConvertLeapSecTimeStamps() {
+        // convert LeapSecTimeStamps from NTP epoch (number of seconds since 1900-01-01 00:00:00)
+        // to JavaScript / Unix (number of milliseconds since 1970-01-01 00:00:00)
+        var delta = Date.parse('1900-01-01');
+        var arrayLen = LeapSecTimeStamps.length;
+        for (var i = 0; i < arrayLen; i++) {
+            LeapSecTimeStamps[i] = LeapSecTimeStamps[i] * 1000 + delta;
+        }
+    }
+    
+    function AdjustForLeapSeconds(TimeStamp) {
+        // adjust a JavaScript timestamp for leap seconds
+        var leapSecs = 0;
+        var arrayLen = LeapSecTimeStamps.length;
+        for (var i = 0; i < arrayLen && TimeStamp >= LeapSecTimeStamps[i]; leapSecs++, i++);
+        if (leapSecs > 0) leapSecs += LeapSecOffset - 1;
+        return TimeStamp + leapSecs * 1000;
     }
 
     this.getHahr = function () {
@@ -222,8 +245,10 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
             // Using Cavern-local time (UTC-0700)
             surface.setMinutes(surface.getMinutes() + (surface.getTimezoneOffset() - (7 * 60)));
         }
-
-        var delta = surface.getTime() - refTimeStamp;
+        
+        var surfaceTimeStamp = makeSurfaceTimeStamp(surface.getUTCFullYear(), surface.getUTCMonth() + 1, surface.getUTCDate(), surface.getUTCHours(), surface.getUTCMinutes(), surface.getUTCSeconds());
+        
+        var delta = surfaceTimeStamp - refTimeStamp;
         // calculate elapsed hahrtee from milliseconds delta
         hahr = Math.floor(delta / msPerHahr);
         delta -= hahr * msPerHahr;
@@ -241,7 +266,7 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
         gorahn = Math.floor(delta / 25);
         delta -= gorahn * 25;
         prorahn = Math.floor(delta);
-        
+
         adjust();
         
         // add reference D'ni hahr (year) and make yahr (day) 1-based instead of 0-based
@@ -250,18 +275,20 @@ function DniDate(hahr, vailee, yahr, gartahvo, tahvo, gorahn, prorahn) {
     }
 
     this.toSurfaceDate = function () {
-        var localDate = new Date();
+        adjust();
         // Convert current values for D'ni date to prorahntee (essentially, time since 1 Leefo 0 DE 0:0:0:0)
         var dTimeInProrahntee = prorahn + (gorahn * 25) + (tahvo * 25 * 25) + (gartahvo * 25 * 25 * 25) + ((yahr - 1) * 5 * 25 * 25 * 25) + ((vailee - 1) * 29 * 5 * 25 * 25 * 25) + (hahr * 290 * 5 * 25 * 25 * 25);        
         // Subtract from reference date prorahntee
         var dTimeDelta = refProrahnteePerHahr - dTimeInProrahntee;        
-        // Multiply by milliseconds per prorahn (1392.8573857142859)
-        dTimeDelta = dTimeDelta * 1392.8573857142859; // ms per prorahn        
+        // Multiply by milliseconds per prorahn
+        dTimeDelta = dTimeDelta * msPerProrahn;
         // Subtract milliseconds from reference timestamp
         dTimeDelta = refTimeStamp - dTimeDelta;
         // Convert new delta value to surface date (UTC)
         var surfaceDate = new Date(dTimeDelta);
-                
+        // Account for leap seconds in more contemporary dates
+        surfaceDate = new Date(AdjustForLeapSeconds(surfaceDate.getTime()));
+
         return surfaceDate;
     }
     
